@@ -16,7 +16,7 @@ const DEFAULTS = {
 };
 
 const ENVIRONMENTS = {
-    prod: "https://api.safebrowse.io",
+    prod: "https://ai-browser-5d4p.onrender.com",
     dev: "http://127.0.0.1:8000",
 };
 
