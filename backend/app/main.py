@@ -1194,3 +1194,40 @@ async def list_api_keys(
             "last_used_at": k.last_used_at.isoformat() if k.last_used_at else None
         })
     return results
+
+
+@app.get("/admin/fix-db", tags=["Admin"])
+def fix_database_schema(session: Session = Depends(get_session)):
+    """
+    Temporary endpoint to migrate database schema.
+    Adds 'tier' column to organization table and ensures DailyUsage exists.
+    """
+    from sqlalchemy import text
+    import sqlmodel
+    results = {}
+    
+    # 1. Add tier column
+    try:
+        session.exec(text("ALTER TABLE organization ADD COLUMN tier VARCHAR DEFAULT 'free'"))
+        session.commit()
+        results["alter_table"] = "Success: Added tier column"
+    except Exception as e:
+        results["alter_table"] = f"Skipped/Error: {str(e)}"
+        
+    # 2. Add sso_enabled column just in case
+    try:
+        session.exec(text("ALTER TABLE organization ADD COLUMN sso_enabled BOOLEAN DEFAULT 0"))
+        session.commit()
+        results["alter_sso"] = "Success: Added sso_enabled column"
+    except Exception as e:
+        results["alter_sso"] = f"Skipped/Error: {str(e)}"
+
+    # 3. Force create new tables (DailyUsage)
+    try:
+        from app.db import engine
+        sqlmodel.SQLModel.metadata.create_all(engine)
+        results["create_tables"] = "Success: Ran create_all"
+    except Exception as e:
+        results["create_tables"] = f"Error: {str(e)}"
+        
+    return results
