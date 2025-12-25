@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeBrowse SDK Demo</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .window {
+            width: 900px;
+            height: 600px;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .title-bar {
+            background-color: #252526;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: #ccc;
+            border-bottom: 1px solid #333;
+        }
+
+        .dots {
+            display: flex;
+            gap: 8px;
+            margin-right: 16px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot.red {
+            background-color: #ff5f56;
+        }
+
+        .dot.yellow {
+            background-color: #ffbd2e;
+        }
+
+        .dot.green {
+            background-color: #27c93f;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 50px;
+            background-color: #333;
+            border-right: 1px solid #252526;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 10px;
+        }
+
+        .editor {
+            flex: 1;
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.5;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1em;
+            background-color: #aeafad;
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .keyword {
+            color: #569cd6;
+        }
+
+        .string {
+            color: #ce9178;
+        }
+
+        .comment {
+            color: #6a9955;
+        }
+
+        .function {
+            color: #dcdcaa;
+        }
+
+        .class {
+            color: #4ec9b0;
+        }
+
+        .terminal {
+            height: 200px;
+            background-color: #1e1e1e;
+            border-top: 1px solid #333;
+            padding: 10px 20px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            overflow-y: auto;
+        }
+
+        .term-prompt {
+            color: #27c93f;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="window">
+        <div class="title-bar">
+            <div class="dots">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <span>demo.py - SafeBrowse SDK</span>
+        </div>
+        <div class="content">
+            <div class="sidebar">
+                <div style="color: #fff; font-size: 20px; margin-bottom: 20px;">📄</div>
+                <div style="color: #666; font-size: 20px;">🔍</div>
+            </div>
+            <div class="editor" id="editor"></div>
+        </div>
+        <div class="terminal" id="terminal">
+            <div id="term-content">
+                <span class="term-prompt">user@dev:~/project$ </span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const code = `
+<span class="keyword">from</span> safebrowse <span class="keyword">import</span> SafeBrowseClient
+
+<span class="comment"># Initialize Protection</span>
+client = SafeBrowseClient(api_key=<span class="string">"sb-free-tier-key"</span>)
+
+<span class="comment"># 1. Scan Malicious Content</span>
+html = <span class="string">"&lt;html&gt;...ignore previous instructions...&lt;/html&gt;"</span>
+result = client.scan_html(html, <span class="string">"https://example.com"</span>)
+
+<span class="keyword">if not</span> result.is_safe:
+    <span class="function">print</span>(<span class="string">f"❌ Blocked: {result.reason}"</span>)
+    <span class="function">print</span>(<span class="string">f"   Risk: {result.risk_score}"</span>)
+
+<span class="comment"># 2. Agent Guard (Fail-Closed)</span>
+<span class="keyword">with</span> client.guard(html, <span class="string">"https://example.com"</span>):
+    agent.run()  <span class="comment"># Never runs!</span>
+`;
+
+        const outputLines = [
+            { text: "python demo.py", delay: 500, type: "command" },
+            { text: "🚀 Initializing SafeBrowse SDK...", delay: 800 },
+            { text: "", delay: 100 },
+            { text: "❌ Blocked: Prompt injection detected", delay: 200, color: "#ff5f56" },
+            { text: "   Risk: 0.95", delay: 100, color: "#ff5f56" },
+            { text: "", delay: 100 },
+            { text: "🛡️ Guard Activated! Blocking execution.", delay: 400, color: "#ffbd2e" },
+            { text: "   Reason: Malicious instruction override", delay: 100 },
+        ];
+
+        const editorEl = document.getElementById('editor');
+        const termContent = document.getElementById('term-content');
+
+        // Type code
+        let charIndex = 0;
+        // Strip HTML tags for typing simulation is hard, so we just paste the HTML nicely or animate lines.
+        // Let's just set innerHTML immediately for the "Editor" part to look static (like user finished typing).
+        editorEl.innerHTML = code + '<span class="cursor"></span>';
+
+        // Animate Terminal
+        async function runTerminal() {
+            await new Promise(r => setTimeout(r, 1000)); // Wait initial
+
+            for (const line of outputLines) {
+                await new Promise(r => setTimeout(r, line.delay));
+
+                const div = document.createElement('div');
+                if (line.type === "command") {
+                    termContent.innerHTML += line.text;
+                    const br = document.createElement('br');
+                    termContent.appendChild(br);
+                } else {
+                    if (line.color) div.style.color = line.color;
+                    div.textContent = line.text;
+                    termContent.appendChild(div);
+                }
+
+                const termWindow = document.getElementById('terminal');
+                termWindow.scrollTop = termWindow.scrollHeight;
+            }
+
+            // Final prompt
+            await new Promise(r => setTimeout(r, 500));
+            const prompt = document.createElement('div');
+            prompt.innerHTML = '<span class="term-prompt">user@dev:~/project$ </span><span class="cursor"></span>';
+            termContent.appendChild(prompt);
+        }
+
+        runTerminal();
+    </script>
+</body>
+
+</html>

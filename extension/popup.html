@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SafeBrowse AI Security</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon" aria-hidden="true">🛡️</span>
+        <span class="logo-text">SafeBrowse AI</span>
+      </div>
+      <div class="version" aria-label="Version 0.2.0">v0.2.0</div>
+    </header>
+
+    <main class="input-section">
+      <label for="query" class="sr-only"
+        style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">Ask
+        about this page</label>
+      <input id="query" type="text" placeholder="Ask about this page..." aria-label="Ask about this page"
+        autocomplete="off" autofocus />
+      <button id="ask" class="btn-primary" aria-label="Scan and Ask">
+        <span class="btn-text">Check Safety</span>
+        <span class="btn-loading" style="display: none;" aria-hidden="true">
+          <span class="spinner"></span>
+        </span>
+      </button>
+    </main>
+
+    <div id="status" class="status" aria-live="polite"></div>
+
+    <div id="answer-container" class="answer-container" style="display: none;" aria-label="AI Safety Analysis">
+      <div id="answer" class="answer"></div>
+    </div>
+
+    <footer class="footer">
+      <span>Safety Score: </span>
+      <span id="risk-score" class="risk-score" aria-label="Current Safety Score">--</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>

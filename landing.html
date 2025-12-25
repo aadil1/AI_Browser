@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeBrowse — Prompt-Injection Firewall for AI Agents</title>
+    <meta name="description"
+        content="Block malicious web content before it reaches your AI. Deterministic. Auditable. Fail-closed by design.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --bg-card: #18181b;
+            --bg-elevated: #27272a;
+            --accent: #6366f1;
+            --accent-soft: rgba(99, 102, 241, 0.15);
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --border: #3f3f46;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            padding: 120px 0 100px;
+            text-align: center;
+            background: radial-gradient(ellipse at top, var(--accent-soft) 0%, transparent 50%);
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(48px, 7vw, 80px);
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 8px;
+        }
+
+        .hero .tagline {
+            font-size: clamp(18px, 3vw, 24px);
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+
+        .hero .subline {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 560px;
+            margin: 0 auto 40px;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            border-color: var(--accent);
+        }
+
+        .pip-command {
+            margin-top: 32px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+
+        .pip-command code {
+            background: var(--bg-card);
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            color: var(--success);
+        }
+
+        /* ===== PROBLEM SECTION ===== */
+        .problem {
+            padding: 100px 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+        .problem h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .problem .highlight {
+            font-size: 28px;
+            color: var(--danger);
+            font-weight: 600;
+            margin-bottom: 32px;
+        }
+
+        .problem p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 640px;
+            margin: 0 auto 16px;
+        }
+
+        .problem .warning {
+            margin-top: 32px;
+            padding: 16px 24px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            display: inline-block;
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        /* ===== SOLUTION SECTION ===== */
+        .solution {
+            padding: 100px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .solution h2 {
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .flow-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+
+        .flow-box {
+            padding: 20px 32px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .flow-box.danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .flow-box.neutral {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+        }
+
+        .flow-box.safe {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .flow-arrow {
+            font-size: 24px;
+            color: var(--text-muted);
+        }
+
+        .blocks-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .block-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .block-item .icon {
+            font-size: 20px;
+        }
+
+        /* ===== DEMO SECTION ===== */
+        .demo {
+            padding: 100px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .demo h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .demo .subtitle {
+            color: var(--text-muted);
+            font-size: 18px;
+            margin-bottom: 48px;
+        }
+
+        .demo-card {
+            max-width: 700px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            text-align: left;
+        }
+
+        .demo-header {
+            padding: 16px 20px;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .demo-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .demo-dot.red {
+            background: #ff5f57;
+        }
+
+        .demo-dot.yellow {
+            background: #febc2e;
+        }
+
+        .demo-dot.green {
+            background: #28c840;
+        }
+
+        .demo-content {
+            padding: 32px;
+        }
+
+        .demo-result {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 10px;
+            margin-bottom: 24px;
+        }
+
+        .demo-result .badge {
+            background: var(--danger);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .demo-result .details {
+            flex: 1;
+        }
+
+        .demo-result .reason {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .demo-result .score {
+            font-weight: 700;
+            color: var(--danger);
+        }
+
+        .demo-note {
+            text-align: center;
+            color: var(--success);
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        /* ===== SDK SECTION ===== */
+        .sdk {
+            padding: 100px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .sdk h2 {
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .code-block {
+            max-width: 700px;
+            margin: 0 auto 32px;
+            background: #0d1117;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            overflow: hidden;
+        }
+
+        .code-header {
+            padding: 12px 16px;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-body {
+            padding: 24px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 15px;
+            line-height: 1.8;
+            color: #e6edf3;
+        }
+
+        .code-body .kw {
+            color: #ff7b72;
+        }
+
+        .code-body .fn {
+            color: #d2a8ff;
+        }
+
+        .code-body .str {
+            color: #a5d6ff;
+        }
+
+        .code-body .cmt {
+            color: #8b949e;
+        }
+
+        .sdk-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .sdk-point {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .sdk-point .check {
+            color: var(--success);
+            font-size: 20px;
+        }
+
+        .sdk-point strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .sdk-point span {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* ===== FEATURES ===== */
+        .features {
+            padding: 100px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .features h2 {
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            padding: 28px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .feature-card .icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* ===== GUARANTEES ===== */
+        .guarantees {
+            padding: 80px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .guarantees h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+
+        .guarantee-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 24px;
+        }
+
+        .guarantee-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: var(--bg-card);
+            border-radius: 50px;
+            border: 1px solid var(--success);
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* ===== FINAL CTA ===== */
+        .final-cta {
+            padding: 100px 0;
+            text-align: center;
+            background: radial-gradient(ellipse at bottom, var(--accent-soft) 0%, transparent 50%);
+        }
+
+        .final-cta h2 {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+
+        .final-cta .actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-card {
+            padding: 24px 40px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .action-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .action-card .icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .action-card .label {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .action-card .sub {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            padding: 32px 0;
+            text-align: center;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <h1>SafeBrowse</h1>
+            <p class="tagline">Prompt-Injection Firewall for AI Agents & RAG Pipelines</p>
+            <p class="subline">
+                Block malicious web content before it reaches your AI.<br>
+                Deterministic. Auditable. Fail-closed by design.
+            </p>
+            <div class="cta-group">
+                <a href="#demo" class="btn btn-secondary">▶ Watch Demo</a>
+                <a href="/dashboard/register.html" class="btn btn-primary">Get Free API Key</a>
+            </div>
+            <p class="pip-command">Get SDK → <code>pip install safebrowse</code></p>
+        </div>
+    </section>
+
+    <!-- PROBLEM -->
+    <section class="problem">
+        <div class="container">
+            <h2>AI reads everything.</h2>
+            <p class="highlight">The web is not safe for AI.</p>
+            <p>Modern AI agents and RAG pipelines ingest untrusted web content.</p>
+            <p>Webpages can contain hidden instructions that hijack LLM behavior — without humans ever seeing it.</p>
+            <div class="warning">⚠️ Prompting alone cannot solve this.</div>
+        </div>
+    </section>
+
+    <!-- SOLUTION -->
+    <section class="solution">
+        <div class="container">
+            <h2>SafeBrowse enforces a hard security boundary.</h2>
+
+            <div class="flow-diagram">
+                <div class="flow-box danger">❌ Before</div>
+                <span class="flow-arrow">:</span>
+                <div class="flow-box neutral">Web</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box neutral">LLM</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box danger">Hope nothing bad happens</div>
+            </div>
+
+            <div class="flow-diagram">
+                <div class="flow-box safe">✓ After</div>
+                <span class="flow-arrow">:</span>
+                <div class="flow-box neutral">Web</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box safe">SafeBrowse</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box neutral">LLM</div>
+            </div>
+
+            <h3 style="text-align: center; margin: 48px 0 24px; color: var(--text-muted);">SafeBrowse blocks:</h3>
+            <div class="blocks-list">
+                <div class="block-item"><span class="icon">🛡️</span> Prompt injection</div>
+                <div class="block-item"><span class="icon">👁️</span> Hidden instructions</div>
+                <div class="block-item"><span class="icon">⚖️</span> Policy violations</div>
+                <div class="block-item"><span class="icon">☠️</span> Poisoned data</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DEMO -->
+    <section class="demo" id="demo">
+        <div class="container">
+            <h2>See SafeBrowse Block a Real Attack</h2>
+            <p class="subtitle">This page looks harmless — but contains hidden instructions designed to hijack AI
+                systems.</p>
+
+            <div class="demo-card">
+                <div class="demo-header">
+                    <span class="demo-dot red"></span>
+                    <span class="demo-dot yellow"></span>
+                    <span class="demo-dot green"></span>
+                </div>
+                <div class="demo-content">
+                    <div class="demo-result">
+                        <span class="badge">🚫 BLOCKED</span>
+                        <div class="details">
+                            <div class="reason">Reason: Hidden prompt injection detected</div>
+                            <div class="score">Risk Score: 0.92</div>
+                        </div>
+                    </div>
+                    <p class="demo-note">
+                        ✓ The AI never sees the content.<br>
+                        ✓ The agent never runs.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SDK -->
+    <section class="sdk">
+        <div class="container">
+            <h2>Security by Construction</h2>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="demo-dot red"></span>
+                    <span class="demo-dot yellow"></span>
+                    <span class="demo-dot green"></span>
+                </div>
+                <div class="code-body">
+                    <span class="kw">from</span> safebrowse <span class="kw">import</span> SafeBrowseClient<br><br>
+                    client = SafeBrowseClient(api_key=<span class="str">"your-key"</span>)<br><br>
+                    <span class="kw">with</span> client.<span class="fn">guard</span>(html, url):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;agent.<span class="fn">run</span>() <span class="cmt"># Only runs if
+                        safe</span>
+                </div>
+            </div>
+
+            <div class="sdk-points">
+                <div class="sdk-point">
+                    <span class="check">✓</span>
+                    <div>
+                        <strong>Execution halts</strong>
+                        <span>If content is unsafe, the agent never runs</span>
+                    </div>
+                </div>
+                <div class="sdk-point">
+                    <span class="check">✓</span>
+                    <div>
+                        <strong>BlockedError raised</strong>
+                        <span>Machine-readable error with context</span>
+                    </div>
+                </div>
+                <div class="sdk-point">
+                    <span class="check">✓</span>
+                    <div>
+                        <strong>Audit ID generated</strong>
+                        <span>Every decision logged for compliance</span>
+                    </div>
+                </div>
+            </div>
+
+            <p style="text-align: center; margin-top: 32px; color: var(--success); font-weight: 600; font-size: 18px;">
+                No silent failures. No bypasses.
+            </p>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features">
+        <div class="container">
+            <h2>Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon">🎯</div>
+                    <h3>Prompt-Injection Detection</h3>
+                    <p>50+ patterns including instruction overrides, role manipulation, and encoding attacks</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">⚙️</div>
+                    <h3>Policy Engine</h3>
+                    <p>Block login forms, payment pages, and suspicious domains automatically</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🧹</div>
+                    <h3>RAG Sanitization</h3>
+                    <p>Clean document chunks before ingestion into vector databases</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📦</div>
+                    <h3>Batch Scanning</h3>
+                    <p>Efficiently scan multiple pages in parallel for pipelines</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🏷️</div>
+                    <h3>Error Codes</h3>
+                    <p>Machine-readable codes for automated response handling</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📋</div>
+                    <h3>Audit Logs</h3>
+                    <p>Full request traceability with correlation IDs</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GUARANTEES -->
+    <section class="guarantees">
+        <div class="container">
+            <h2>Security Guarantees</h2>
+            <div class="guarantee-list">
+                <div class="guarantee-item">✓ Fail-closed (cannot be disabled)</div>
+                <div class="guarantee-item">✓ No allow_unsafe flags</div>
+                <div class="guarantee-item">✓ Errors always block</div>
+                <div class="guarantee-item">✓ Deterministic decisions</div>
+            </div>
+            <p style="margin-top: 32px; font-size: 20px; font-weight: 700;">Security is not optional.</p>
+        </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="final-cta">
+        <div class="container">
+            <h2>Protect your AI systems today.</h2>
+            <div class="actions">
+                <a href="#" class="action-card">
+                    <div class="icon">📦</div>
+                    <div class="label">pip install safebrowse</div>
+                    <div class="sub">Get the SDK</div>
+                </a>
+                <a href="https://github.com/safebrowse/safebrowse-python" class="action-card">
+                    <div class="icon">⭐</div>
+                    <div class="label">Star on GitHub</div>
+                    <div class="sub">Open source</div>
+                </a>
+                <a href="#" class="action-card">
+                    <div class="icon">📄</div>
+                    <div class="label">Read the Docs</div>
+                    <div class="sub">Full documentation</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>SafeBrowse v0.2.0 — Built for AI Security</p>
+        <p style="margin-top: 8px;">
+            <a href="#">Documentation</a> ·
+            <a href="#">GitHub</a> ·
+            <a href="#">PyPI</a>
+        </p>
+    </footer>
+
+</body>
+
+</html>

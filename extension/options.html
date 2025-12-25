@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>SafeBrowse Settings</title>
+    <link rel="stylesheet" href="options.css" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="icons/icon48.png" alt="SafeBrowse" class="logo" />
+            <h1>SafeBrowse Settings</h1>
+        </div>
+
+        <div class="section">
+            <h2>🔑 API Configuration</h2>
+
+            <label class="field">
+                <span class="label">API Key</span>
+                <input type="password" id="apiKey" placeholder="sb_live_..." />
+                <span class="hint">Get your API key from the Dashboard (dashboard/index.html)</span>
+            </label>
+
+            <label class="field">
+                <span class="label">Backend Environment</span>
+                <select id="environment">
+                    <option value="prod">Production (api.safebrowse.io)</option>
+                    <option value="dev">Development (localhost:8000)</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="section">
+            <h2>🛡️ Security Modes</h2>
+
+            <label class="checkbox-field">
+                <input type="checkbox" id="scanOnly" />
+                <div class="checkbox-content">
+                    <span class="checkbox-label">Scan-only mode</span>
+                    <span class="checkbox-hint">Only scan for threats, no AI answers</span>
+                </div>
+            </label>
+
+            <label class="checkbox-field">
+                <input type="checkbox" id="enterpriseMode" />
+                <div class="checkbox-content">
+                    <span class="checkbox-label">Enterprise mode</span>
+                    <span class="checkbox-hint">Strict policies, audit-only output, no AI responses</span>
+                </div>
+            </label>
+        </div>
+
+        <div class="section">
+            <h2>🏢 Enterprise Settings</h2>
+
+            <label class="field">
+                <span class="label">Allowed Domains (one per line)</span>
+                <textarea id="allowedDomains" placeholder="docs.company.com&#10;internal.company.com"></textarea>
+                <span class="hint">Leave empty to allow all domains</span>
+            </label>
+        </div>
+
+        <div class="actions">
+            <button id="save" class="btn-primary">Save Settings</button>
+            <button id="reset" class="btn-secondary">Reset to Defaults</button>
+        </div>
+
+        <p id="status" class="status"></p>
+
+        <div class="footer">
+            <p>SafeBrowse v1.0.0 — <a href="https://safebrowse.io" target="_blank">Documentation</a></p>
+        </div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+
+</html>

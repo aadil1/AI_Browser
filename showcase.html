@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeBrowse - AI Browser Security</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a25;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --border: #27272a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            padding: 100px 20px 80px;
+            text-align: center;
+            background: radial-gradient(ellipse at top, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 50px;
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: clamp(40px, 6vw, 72px);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            border-color: var(--accent);
+        }
+
+        /* Code Block */
+        .code-showcase {
+            max-width: 700px;
+            margin: 60px auto 0;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .code-header {
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .code-dot.red {
+            background: #ff5f57;
+        }
+
+        .code-dot.yellow {
+            background: #febc2e;
+        }
+
+        .code-dot.green {
+            background: #28c840;
+        }
+
+        .code-content {
+            padding: 24px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #e4e4e7;
+        }
+
+        .code-content .keyword {
+            color: #c084fc;
+        }
+
+        .code-content .string {
+            color: #34d399;
+        }
+
+        .code-content .comment {
+            color: #71717a;
+        }
+
+        .code-content .function {
+            color: #60a5fa;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 60px;
+            font-size: 18px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 60px 20px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stats-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+
+        .stat-item h2 {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .stat-item p {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* Demo Section */
+        .demo-section {
+            padding: 80px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .demo-terminal {
+            background: #0d1117;
+            border-radius: 16px;
+            border: 1px solid #30363d;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            padding: 12px 16px;
+            background: #161b22;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .terminal-title {
+            color: #8b949e;
+            font-size: 14px;
+            margin-left: auto;
+        }
+
+        .terminal-content {
+            padding: 24px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            line-height: 2;
+        }
+
+        .terminal-line {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .terminal-prompt {
+            color: #58a6ff;
+        }
+
+        .terminal-output {
+            padding-left: 20px;
+        }
+
+        .terminal-success {
+            color: var(--success);
+        }
+
+        .terminal-error {
+            color: var(--danger);
+        }
+
+        .terminal-warning {
+            color: var(--warning);
+        }
+
+        .terminal-muted {
+            color: #8b949e;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <span class="badge">v0.2.0 — Enterprise Ready</span>
+        <h1>SafeBrowse</h1>
+        <p class="subtitle">
+            Protect your AI agents from prompt injection attacks.
+            Scan web content before your LLM processes it.
+        </p>
+        <div class="cta-buttons">
+            <a href="#demo" class="btn btn-primary">See Demo</a>
+            <a href="https://github.com/safebrowse/safebrowse-python" class="btn btn-secondary">GitHub →</a>
+        </div>
+
+        <div class="code-showcase">
+            <div class="code-header">
+                <span class="code-dot red"></span>
+                <span class="code-dot yellow"></span>
+                <span class="code-dot green"></span>
+            </div>
+            <div class="code-content">
+                <span class="keyword">from</span> safebrowse <span class="keyword">import</span>
+                SafeBrowseClient<br><br>
+                client = SafeBrowseClient(api_key=<span class="string">"your-key"</span>)<br><br>
+                <span class="comment"># Protect your AI agent</span><br>
+                <span class="keyword">with</span> client.<span class="function">guard</span>(html, url) <span
+                    class="keyword">as</span> decision:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span> decision.risk_score < <span class="string">
+                    0.5</span>:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;agent.<span class="function">run</span>() <span
+                        class="comment"># Safe to proceed</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2 class="section-title">Enterprise Security Features</h2>
+        <p class="section-subtitle">Everything you need to secure AI-powered applications</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Prompt Injection Detection</h3>
+                <p>Detects 50+ attack patterns including instruction overrides, role manipulation, and encoding attacks.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <h3>Policy Engine</h3>
+                <p>Block login forms, payment pages, and suspicious domains. Keep AI agents away from sensitive content.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🧹</div>
+                <h3>RAG Sanitization</h3>
+                <p>Clean document chunks before ingestion into vector databases. Prevent RAG poisoning attacks.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📦</div>
+                <h3>Batch Scanning</h3>
+                <p>Efficiently scan multiple pages in parallel. Perfect for web scraping and content pipelines.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Fail-Closed Design</h3>
+                <p>Errors always block, never fail open. Security cannot be accidentally bypassed.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3>Audit Logging</h3>
+                <p>Full request traceability with unique IDs. Enterprise compliance ready.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h2>50+</h2>
+                <p>Attack Patterns Detected</p>
+            </div>
+            <div class="stat-item">
+                <h2>100%</h2>
+                <p>Red Team Detection Rate</p>
+            </div>
+            <div class="stat-item">
+                <h2>&lt;50ms</h2>
+                <p>Average Scan Time</p>
+            </div>
+            <div class="stat-item">
+                <h2>0</h2>
+                <p>Bypass Options</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo-section" id="demo">
+        <h2 class="section-title">Live Demo</h2>
+        <p class="section-subtitle">See SafeBrowse in action</p>
+
+        <div class="demo-terminal">
+            <div class="terminal-header">
+                <span class="code-dot red"></span>
+                <span class="code-dot yellow"></span>
+                <span class="code-dot green"></span>
+                <span class="terminal-title">python demo.py</span>
+            </div>
+            <div class="terminal-content">
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span>
+                    <span>python demo_quick.py</span>
+                </div>
+                <br>
+                <div class="terminal-output">
+                    <span class="terminal-muted">[1] Scanning SAFE content...</span><br>
+                    <span class="terminal-success">&nbsp;&nbsp;&nbsp;&nbsp;✓ SAFE - Risk: 0.00</span><br><br>
+
+                    <span class="terminal-muted">[2] Scanning PROMPT INJECTION...</span><br>
+                    <span class="terminal-error">&nbsp;&nbsp;&nbsp;&nbsp;✗ BLOCKED - Risk: 0.95</span><br>
+                    <span class="terminal-muted">&nbsp;&nbsp;&nbsp;&nbsp;Reason: Prompt injection
+                        detected</span><br><br>
+
+                    <span class="terminal-muted">[3] Detecting LOGIN FORM...</span><br>
+                    <span class="terminal-warning">&nbsp;&nbsp;&nbsp;&nbsp;⚠ FLAGGED - Risk: 0.60</span><br>
+                    <span class="terminal-muted">&nbsp;&nbsp;&nbsp;&nbsp;Policy: ['login_form_detected']</span><br><br>
+
+                    <span class="terminal-muted">[4] RAG Pipeline Sanitization...</span><br>
+                    <span class="terminal-muted">&nbsp;&nbsp;&nbsp;&nbsp;Input: 3 chunks</span><br>
+                    <span class="terminal-success">&nbsp;&nbsp;&nbsp;&nbsp;Safe: 2</span> | <span
+                        class="terminal-error">Blocked: 1</span><br><br>
+
+                    <span class="terminal-muted">[5] Guard Context Manager...</span><br>
+                    <span class="terminal-success">&nbsp;&nbsp;&nbsp;&nbsp;✓ Agent allowed - Risk: 0.00</span><br><br>
+
+                    <span class="terminal-success">Demo Complete! All features working.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>SafeBrowse v0.2.0 — Built for AI Security</p>
+        <p style="margin-top: 12px;">
+            <a href="#">Documentation</a> ·
+            <a href="#">GitHub</a> ·
+            <a href="#">PyPI</a>
+        </p>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,308 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\Aadil\AppData\Local\Programs\Python\Python314\python.exe
+cachedir: .pytest_cache
+rootdir: G:\AI_Browser\backend
+plugins: anyio-4.11.0
+collecting ... collected 1 item
+
+tests/test_api.py::TestSafetyEndpoints::test_safe_ask_returns_answer FAILED [100%]
+
+================================== FAILURES ===================================
+______________ TestSafetyEndpoints.test_safe_ask_returns_answer _______________
+
+self = <tests.test_api.TestSafetyEndpoints object at 0x0000028145DADCD0>
+
+    def test_safe_ask_returns_answer(self):
+        """Safe ask endpoint returns LLM answer."""
+>       response = client.post(
+            "/safe-ask",
+            headers=HEADERS,
+            json={
+                "url": "http://example.com",
+                "html": "<html><body><h1>Welcome to Example</h1><p>This is a test page.</p></body></html>",
+                "query": "What is this page about?"
+            }
+        )
+
+tests\test_api.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\testclient.py:546: in post
+    return super().post(
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\httpx\_client.py:1144: in post
+    return self.request(
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\testclient.py:445: in request
+    return super().request(
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\testclient.py:348: in handle_request
+    raise exc
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\from_thread.py:321: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\concurrent\futures\_base.py:450: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\concurrent\futures\_base.py:395: in __get_result
+    raise self._exception
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\anyio\from_thread.py:252: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\fastapi\applications.py:1139: in __call__
+    await super().__call__(scope, receive, send)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\applications.py:107: in __call__
+    await self.middleware_stack(scope, receive, send)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\middleware\base.py:191: in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ^^^^^^^^^^^^^^^^^^^^
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\contextlib.py:162: in __exit__
+    self.gen.throw(value)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\_utils.py:85: in collapse_excgroups
+    raise exc
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\middleware\base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\main.py:142: in log_requests
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\middleware\base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\middleware\base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\middleware\cors.py:85: in __call__
+    await self.app(scope, receive, send)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\routing.py:716: in __call__
+    await self.middleware_stack(scope, receive, send)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\routing.py:736: in app
+    await route.handle(scope, receive, send)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\routing.py:290: in handle
+    await self.app(scope, receive, send)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\fastapi\routing.py:120: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\fastapi\routing.py:106: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\fastapi\routing.py:430: in app
+    raw_response = await run_endpoint_function(
+C:\Users\Aadil\AppData\Local\Programs\Python\Python314\Lib\site-packages\fastapi\routing.py:316: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = SafeAskRequest(url=HttpUrl('http://example.com/'), html='<html><body><h1>Welcome to Example</h1><p>This is a test page.</p></body></html>', query='What is this page about?')
+org = Organization(id=0, name='System/Test', tier='enterprise', created_at=datetime.datetime(2025, 12, 23, 14, 2, 47, 129253), sso_enabled=False)
+
+    @app.post("/safe-ask", response_model=SafeAskResponse, tags=["Core"])
+    async def safe_ask(payload: SafeAskRequest, org: Organization = Depends(get_current_org_and_check_quota)):
+        """
+        Safely answer a question about a webpage.
+    
+        1. Validates API key
+        2. Checks HTML size limits
+        3. Evaluates policy rules
+        4. Checks for prompt injection attacks
+        5. If safe, sends to LLM for answering
+        6. Logs to audit trail
+        """
+        request_id = str(uuid.uuid4())
+        url_str = str(payload.url)
+        audit_logger = get_audit_logger()
+        policy_engine = get_policy_engine()
+    
+        # API key is validated by Depends(get_current_org_and_check_quota)
+    
+        all_explanations = []
+        policy_violations = []
+    
+        # Check HTML size limit
+        if len(payload.html) > MAX_HTML_SIZE:
+            logger.warning(f"[{request_id}] Page too large: {len(payload.html)} bytes")
+            all_explanations.append("Content exceeds maximum size limit (5MB)")
+    
+            audit_logger.log_request(
+                request_id=request_id,
+                url=url_str,
+                status="blocked",
+                risk_score=1.0,
+                reasons=all_explanations,
+                policy_violations=[],
+                api_key_hash=hash_api_key(api_key),
+            )
+    
+            return SafeAskResponse(
+                status="blocked",
+                reason="Page too large to analyze safely (max 5MB)",
+                explanations=all_explanations,
+                risk_score=1.0,
+                version=settings.version,
+                request_id=request_id,
+            )
+    
+        # Step 1: Policy check
+        policy_result = policy_engine.evaluate(payload.html, url_str)
+        if policy_result.violations:
+            policy_violations = policy_result.explanations
+            all_explanations.extend(policy_violations)
+    
+        if not policy_result.allowed:
+            logger.warning(f"[{request_id}] Policy blocked: {policy_violations}")
+    
+            audit_logger.log_request(
+                request_id=request_id,
+                url=url_str,
+                status="blocked",
+                risk_score=policy_result.risk_score,
+                reasons=all_explanations,
+                policy_violations=policy_violations,
+                api_key_hash=hash_api_key(api_key),
+            )
+    
+            return SafeAskResponse(
+                status="blocked",
+                reason="Page blocked by security policy",
+                explanations=all_explanations,
+                risk_score=policy_result.risk_score,
+                version=settings.version,
+                request_id=request_id,
+            )
+    
+        # Step 2: Safety check (prompt injection)
+        try:
+            is_safe, risk = is_page_safe(payload.html)
+        except Exception as e:
+            logger.error(f"[{request_id}] Safety check failed: {e}")
+            all_explanations.append("Safety system encountered an error (fail-closed)")
+    
+            audit_logger.log_request(
+                request_id=request_id,
+                url=url_str,
+                status="blocked",
+                risk_score=1.0,
+                reasons=all_explanations,
+                policy_violations=policy_violations,
+                api_key_hash=hash_api_key(api_key),
+            )
+    
+            return SafeAskResponse(
+                status="blocked",
+                reason="Safety system failure (fail-closed)",
+                explanations=all_explanations,
+                risk_score=1.0,
+                version=settings.version,
+                request_id=request_id,
+            )
+    
+        # Combine policy and safety risks
+        combined_risk = max(risk, policy_result.risk_score)
+    
+        # Step 3: Block if unsafe
+        if not is_safe:
+            all_explanations.append("Content matched prompt injection detection patterns")
+            logger.warning(f"[{request_id}] Page blocked - risk: {risk:.2f}, url: {url_str}")
+    
+            audit_logger.log_request(
+                request_id=request_id,
+                url=url_str,
+                status="blocked",
+                risk_score=combined_risk,
+                reasons=all_explanations,
+                policy_violations=policy_violations,
+                api_key_hash=hash_api_key(api_key),
+            )
+    
+            return SafeAskResponse(
+                status="blocked",
+                reason="ΓÜá∩╕Å This page has been flagged for possible prompt-injection or malicious instructions.",
+                explanations=all_explanations,
+                risk_score=combined_risk,
+                version=settings.version,
+                request_id=request_id,
+            )
+    
+        # Step 4: Get LLM answer
+        try:
+            answer = browsing_agent_answer(
+                query=payload.query,
+                html=payload.html,
+                url=url_str,
+            )
+        except Exception as e:
+            logger.error(f"[{request_id}] LLM agent failed: {e}")
+            all_explanations.append("LLM service encountered an error (fail-closed)")
+    
+            audit_logger.log_request(
+                request_id=request_id,
+                url=url_str,
+                status="blocked",
+                risk_score=1.0,
+                reasons=all_explanations,
+                policy_violations=policy_violations,
+                api_key_hash=hash_api_key(api_key),
+            )
+    
+            return SafeAskResponse(
+                status="blocked",
+                reason="LLM service failure (fail-closed)",
+                explanations=all_explanations,
+                risk_score=1.0,
+                version=settings.version,
+                request_id=request_id,
+            )
+    
+        # Success - log and return
+        audit_logger.log_request(
+            request_id=request_id,
+            url=url_str,
+            status="ok",
+            risk_score=combined_risk,
+            reasons=[],
+            policy_violations=policy_violations,
+>           api_key_hash=hash_api_key(api_key),
+                                      ^^^^^^^
+        )
+E       NameError: name 'api_key' is not defined
+
+app\main.py:334: NameError
+------------------------------ Captured log call ------------------------------
+WARNING  app.agent:agent.py:59 HTML parsing failed: Couldn't find a tree builder with the features you requested: lxml. Do you need to install a parser library?
+============================== warnings summary ===============================
+app\config.py:13
+  G:\AI_Browser\backend\app\config.py:13: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class Settings(BaseSettings):
+
+tests/test_api.py::TestSafetyEndpoints::test_safe_ask_returns_answer
+  G:\AI_Browser\backend\app\main.py:65: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return Organization(id=0, name="System/Test", tier="enterprise", created_at=datetime.utcnow())
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_api.py::TestSafetyEndpoints::test_safe_ask_returns_answer
+======================== 1 failed, 2 warnings in 2.35s ========================

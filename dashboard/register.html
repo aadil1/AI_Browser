@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeBrowse — Sign Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --bg-card: #18181b;
+            --accent: #6366f1;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --border: #3f3f46;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 24px;
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 24px;
+        }
+
+        p.subtitle {
+            margin: 0 0 24px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: #27272a;
+            color: var(--text);
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .error {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .login-link a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-card">
+        <h1>Create Account</h1>
+        <p class="subtitle">Get your free API key to start protecting your AI agents.</p>
+
+        <form id="register-form" onsubmit="handleRegister(event)">
+            <div class="form-group">
+                <label for="org">Team / Organization Name</label>
+                <input type="text" id="org" placeholder="Acme AI Inc.">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="name@company.com">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required minlength="8">
+            </div>
+
+            <div id="error-msg" class="error"></div>
+
+            <button type="submit" class="btn" id="submit-btn">Get Free API Key</button>
+        </form>
+
+        <div class="login-link">
+            Already have a key? <a href="/dashboard/">Go to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        // Use relative backend URL if served from same origin, else local dev
+        const isDev = window.location.port === '8001';
+        const BACKEND = isDev ? 'http://localhost:8000' : '';
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            const errorDiv = document.getElementById('error-msg');
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const orgName = document.getElementById('org').value;
+
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Creating Account...';
+                errorDiv.style.display = 'none';
+
+                const response = await fetch(`${BACKEND}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, org_name: orgName })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Registration failed');
+                }
+
+                // Success! Save config and redirect
+                const config = {
+                    backendUrl: BACKEND || window.location.origin, // If empty, use current origin
+                    apiKey: data.api_key
+                };
+
+                localStorage.setItem('safebrowse-dashboard-config', JSON.stringify(config));
+
+                // Redirect
+                window.location.href = '/dashboard/';
+
+            } catch (err) {
+                errorDiv.textContent = err.message;
+                errorDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Get Free API Key';
+            }
+        }
+    </script>
+</body>
+
+</html>

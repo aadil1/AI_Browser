@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeBrowse Management Console</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Google+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="app">
+        <!-- Login Modal (Hidden by default) -->
+        <div id="login-modal" class="modal-overlay" style="display: none;">
+            <div class="modal">
+                <h2 style="margin-bottom: 12px; font-weight: 500;">Welcome Back</h2>
+                <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 14px; line-height: 1.5;">
+                    Enter your API Key to access the dashboard.
+                </p>
+
+                <div style="margin-bottom: 16px;">
+                    <label
+                        style="display: block; margin-bottom: 8px; font-size: 12px; font-weight: 500; color: var(--text-muted);">API
+                        KEY</label>
+                    <input type="text" id="login-api-key" placeholder="sb_live_..."
+                        style="width: 100%; padding: 12px; background: #f1f3f4; border: 1px solid transparent; border-radius: 4px; font-family: monospace; font-size: 14px; outline: none;">
+                </div>
+
+                <button onclick="handleLogin()" class="btn btn-primary"
+                    style="width: 100%; justify-content: center; margin-bottom: 16px;">
+                    Connect Dashboard
+                </button>
+
+                <p style="font-size: 13px; text-align: center; color: var(--text-muted);">
+                    Don't have a key? <a href="/dashboard/register.html"
+                        style="color: var(--accent); text-decoration: none; font-weight: 500;">Get one for free</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" role="navigation" aria-label="Main Navigation">
+            <div class="logo">
+                <span class="logo-text">SafeBrowse</span>
+            </div>
+            <nav class="nav">
+                <a href="#" class="nav-item active" data-section="overview" aria-current="page">
+                    <span class="nav-icon" aria-hidden="true">📊</span>
+                    Overview
+                </a>
+                <a href="#" class="nav-item" data-section="api-keys">
+                    <span class="nav-icon" aria-hidden="true">🔑</span>
+                    API Keys
+                </a>
+                <a href="#" class="nav-item" data-section="audit">
+                    <span class="nav-icon" aria-hidden="true">📋</span>
+                    Audit Logs
+                </a>
+                <a href="#" class="nav-item" data-section="settings">
+                    <span class="nav-icon" aria-hidden="true">⚙️</span>
+                    Settings
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="version" aria-label="Version 1.0.0">v1.0.0</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main" id="main-content">
+            <!-- Header -->
+            <header class="header">
+                <h1 id="page-title">Overview</h1>
+                <div class="header-actions">
+                    <span class="status-indicator online" role="status">Backend Online</span>
+                </div>
+            </header>
+
+            <!-- Overview Section -->
+            <section id="section-overview" class="section active" aria-labelledby="page-title">
+                <div class="stats-grid">
+                    <div class="stat-card" aria-label="Total requests in last 24 hours">
+                        <div class="stat-content">
+                            <div class="stat-value" id="total-requests" aria-live="polite">--</div>
+                            <div class="stat-label">Total Requests (24h)</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" aria-label="Blocked requests">
+                        <div class="stat-content">
+                            <div class="stat-value" id="blocked-requests" aria-live="polite">--</div>
+                            <div class="stat-label">Blocked</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" aria-label="Allowed requests">
+                        <div class="stat-content">
+                            <div class="stat-value" id="allowed-requests" aria-live="polite">--</div>
+                            <div class="stat-label">Allowed</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" aria-label="Current block rate">
+                        <div class="stat-content">
+                            <div class="stat-value" id="block-rate" aria-live="polite">--%</div>
+                            <div class="stat-label">Block Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Recent Activity</h2>
+                    <div class="table-container">
+                        <table class="table" id="recent-activity" aria-label="Recent system activity">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>URL</th>
+                                    <th>Status</th>
+                                    <th>Risk</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" class="loading">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- API Keys Section -->
+            <section id="section-api-keys" class="section" aria-label="API Key Management">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Your API Keys</h2>
+                        <button class="btn btn-primary" id="generate-key-btn" aria-label="Generate new API key">+
+                            Generate New Key</button>
+                    </div>
+
+                    <div class="info-box" role="note">
+                        <strong>Deployment Instructions:</strong>
+                        <ol>
+                            <li>Copy your API key below.</li>
+                            <li>Add it to your backend <code>.env</code> file.</li>
+                            <li>Distribute to your team for use in the Chrome Extension.</li>
+                        </ol>
+                    </div>
+
+                    <div class="api-keys-list" id="api-keys-list">
+                        <!-- Key items injected here -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Provision New Access Key</h2>
+                    <div class="form-group">
+                        <label for="key-name">Key Name (e.g., Marketing Team, Finance)</label>
+                        <input type="text" id="key-name" placeholder="Team Name" aria-label="Key Name">
+                    </div>
+                    <div class="generated-key-container" id="generated-key-container" style="display: none;"
+                        role="alert" aria-live="assertive">
+                        <div class="alert alert-success">
+                            <strong>Provisioning Successful!</strong>
+                            <p>Copy this key now. It will not be shown again for security reasons.</p>
+                            <code id="generated-key" class="generated-key"></code>
+                            <button class="btn btn-copy" onclick="copyGeneratedKey()"
+                                aria-label="Copy new key to clipboard">Copy to Clipboard</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="generate-btn" onclick="generateApiKey()"
+                        aria-label="Confirm key generation">Provision Key</button>
+                </div>
+            </section>
+
+            <!-- Audit Logs Section -->
+            <section id="section-audit" class="section" aria-label="Compliance Audit Logs">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Audit Logs</h2>
+                        <div class="filters">
+                            <select id="status-filter" aria-label="Filter by status">
+                                <option value="">All Statuses</option>
+                                <option value="ok">Allowed</option>
+                                <option value="blocked">Blocked</option>
+                            </select>
+                            <button class="btn btn-secondary" onclick="loadAuditLogs()"
+                                aria-label="Refresh logs">Refresh</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="table" id="audit-table" aria-label="System audit log table">
+                            <thead>
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>Timestamp</th>
+                                    <th>URL</th>
+                                    <th>Status</th>
+                                    <th>Risk Score</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-logs-body">
+                                <tr>
+                                    <td colspan="6" class="loading">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="section-settings" class="section" aria-label="Backend Configuration">
+                <div class="card">
+                    <h2>Connectivity Settings</h2>
+                    <div class="form-group">
+                        <label for="backend-url">Backend Endpoint</label>
+                        <input type="text" id="backend-url" placeholder="http://localhost:8000 or empty for relative"
+                            aria-label="Backend URL">
+                    </div>
+                    <div class="form-group">
+                        <label for="dashboard-api-key">Administrative API Key</label>
+                        <input type="password" id="dashboard-api-key" placeholder="Enter master key"
+                            aria-label="Administrative API Key">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSettings()"
+                        aria-label="Save backend configuration">Save Configuration</button>
+                </div>
+
+                <div class="card">
+                    <h2>Engine Status</h2>
+                    <div class="status-list" id="capabilities-list" aria-live="polite">
+                        <div class="status-item">
+                            <span class="status-name">Detecting safety features...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>
