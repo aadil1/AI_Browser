@@ -31,9 +31,14 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-dark);
+            background-color: #000000;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
             color: var(--text);
             line-height: 1.6;
+            min-height: 100vh;
         }
 
         .container {
@@ -586,7 +591,7 @@
                 Deterministic. Auditable. Fail-closed by design.
             </p>
             <div class="cta-group">
-                <a href="#demo" class="btn btn-secondary">▶ Watch Demo</a>
+                <a href="#demo" class="btn btn-secondary">▶ Try It</a>
                 <a href="/dashboard/register.html" class="btn btn-primary">Get Free API Key</a>
             </div>
             <p class="pip-command">Get SDK → <code>pip install safebrowse</code></p>
@@ -782,11 +787,11 @@
                     <div class="label">pip install safebrowse</div>
                     <div class="sub">Get the SDK</div>
                 </a>
-                <a href="https://gitlab.com/aadil11/ai_browser" class="action-card">
-                    <div class="icon">⭐</div>
-                    <div class="label">Star on GitLab</div>
-                    <div class="sub">Open source</div>
-                </a>
+                <div class="action-card">
+                    <div class="icon">🚀</div>
+                    <div class="label">Open Source</div>
+                    <div class="sub">Publishing Soon</div>
+                </div>
                 <a href="/docs" class="action-card">
                     <div class="icon">📄</div>
                     <div class="label">Read the Docs</div>
