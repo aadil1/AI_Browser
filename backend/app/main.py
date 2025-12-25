@@ -239,10 +239,15 @@ async def safe_ask(
         )
     
     # Step 1: Policy check
-    policy_result = policy_engine.evaluate(payload.html, url_str)
-    if policy_result.violations:
-        policy_violations = policy_result.explanations
-        all_explanations.extend(policy_violations)
+    if org.tier != "free":
+        policy_result = policy_engine.evaluate(payload.html, url_str)
+        if policy_result.violations:
+            policy_violations = policy_result.explanations
+            all_explanations.extend(policy_violations)
+    else:
+        # Free tier skips policy engine
+        from app.policy_engine import PolicyResult
+        policy_result = PolicyResult(allowed=True, violations=[])
     
     if not policy_result.allowed:
         logger.warning(f"[{request_id}] Policy blocked: {policy_violations}")
@@ -397,10 +402,14 @@ async def scan_html(payload: ScanHtmlRequest, org: Organization = Depends(get_cu
         )
     
     # Policy check
-    policy_result = policy_engine.evaluate(payload.html, url_str)
-    if policy_result.violations:
-        policy_violations = policy_result.explanations
-        all_explanations.extend(policy_violations)
+    if org.tier != "free":
+        policy_result = policy_engine.evaluate(payload.html, url_str)
+        if policy_result.violations:
+            policy_violations = policy_result.explanations
+            all_explanations.extend(policy_violations)
+    else:
+         from app.policy_engine import PolicyResult
+         policy_result = PolicyResult(allowed=True, violations=[])
     
     # Safety check
     try:
@@ -455,10 +464,10 @@ async def get_audit_logs(
 ):
     """
     Get paginated audit logs.
-    [ENTERPRISE ONLY]
+    [PRO and ENTERPRISE]
     """
-    if org.tier != "enterprise":
-        raise HTTPException(status_code=403, detail="Audit logs are available on Enterprise tier only.")
+    if org.tier == "free":
+        raise HTTPException(status_code=403, detail="Audit logs are available on PRO and ENTERPRISE tiers.")
     
     audit_logger = get_audit_logger()
     logs = audit_logger.get_logs(limit=limit, offset=offset, status=status, domain=domain)
@@ -491,6 +500,9 @@ async def get_audit_stats(
     Get aggregated audit statistics.
     Useful for dashboards and compliance reporting.
     """
+    if org.tier == "free":
+        raise HTTPException(status_code=403, detail="Audit stats are available on PRO and ENTERPRISE tiers.")
+    
     # API key validated by dependency
     
     audit_logger = get_audit_logger()

@@ -6,7 +6,7 @@ from app.models import Organization, DailyUsage, Tier
 # Limits per tier
 TIER_LIMITS = {
     Tier.FREE: 100,
-    Tier.PRO: 1000,
+    Tier.PRO: 10000,
     Tier.ENTERPRISE: 1000000 # Effectively unlimited
 }
 
