@@ -814,60 +814,66 @@ async def register(
     Auto-generates an API key for immediate use.
     """
     # 1. Check if user exists
-    statement = select(User).where(User.email == user_in.email)
-    existing_user = session.exec(statement).first()
-    if existing_user:
-        raise HTTPException(
-            status_code=400,
-            detail="User with this email already exists"
+    try:
+        statement = select(User).where(User.email == user_in.email)
+        existing_user = session.exec(statement).first()
+        if existing_user:
+            raise HTTPException(
+                status_code=400,
+                detail="User with this email already exists"
+            )
+        
+        # 2. Create Organization
+        org = Organization(
+            name=user_in.org_name or f"{user_in.email.split('@')[0]}'s Org",
+            tier="free"
         )
-    
-    # 2. Create Organization
-    org = Organization(
-        name=user_in.org_name or f"{user_in.email.split('@')[0]}'s Org",
-        tier="free"
-    )
-    session.add(org)
-    session.commit()
-    session.refresh(org)
-    
-    # 3. Create User
-    hashed_password = get_password_hash(user_in.password)
-    user = User(
-        email=user_in.email,
-        hashed_password=hashed_password,
-        org_id=org.id,
-        is_active=True
-    )
-    session.add(user)
-    session.commit()
-    session.refresh(user)
-    
-    # 4. Create Initial API Key
-    # Generate random key
-    raw_key = f"sb_live_{secrets.token_urlsafe(24)}"
-    key_hash = hashlib.sha256(raw_key.encode()).hexdigest()
-    
-    api_key = APIKey(
-        key_hash=key_hash,
-        label="Default Key",
-        user_id=user.id,
-        org_id=org.id
-    )
-    session.add(api_key)
-    session.commit()
-    
-    # 5. Generate Login Token
-    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
-    access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
-    )
-    
-    return {
-        "access_token": access_token, 
-        "token_type": "bearer",
-        "api_key": raw_key
-    }
+        session.add(org)
+        session.commit()
+        session.refresh(org)
+        
+        # 3. Create User
+        hashed_password = get_password_hash(user_in.password)
+        user = User(
+            email=user_in.email,
+            hashed_password=hashed_password,
+            org_id=org.id,
+            is_active=True
+        )
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        
+        # 4. Create Initial API Key
+        # Generate random key
+        raw_key = f"sb_live_{secrets.token_urlsafe(24)}"
+        key_hash = hashlib.sha256(raw_key.encode()).hexdigest()
+        
+        api_key = APIKey(
+            key_hash=key_hash,
+            label="Default Key",
+            user_id=user.id,
+            org_id=org.id
+        )
+        session.add(api_key)
+        session.commit()
+        
+        # 5. Generate Login Token
+        access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+        access_token = create_access_token(
+            data={"sub": user.email}, expires_delta=access_token_expires
+        )
+        
+        return {
+            "access_token": access_token, 
+            "token_type": "bearer",
+            "api_key": raw_key
+        }
+    except Exception as e:
+        import traceback
+        error_msg = f"Registration Error: {str(e)} Type: {type(e).__name__} Trace: {traceback.format_exc()}"
+        print(error_msg) # Log it
+        raise HTTPException(status_code=500, detail=error_msg)
 
 
 @app.post("/auth/token", response_model=Token, tags=["Auth"])
