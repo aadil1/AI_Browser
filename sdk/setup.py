@@ -5,13 +5,13 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name="safebrowse",
-    version="0.3.0",
+    version="0.3.2",
     description="Python SDK for SafeBrowse - AI-powered browser security with prompt injection detection",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="SafeBrowse",
-    author_email="hello@safebrowse.io",
-    url="https://github.com/safebrowse/safebrowse-python",
+    author_email="aadilsayed19@gmail.com",
+    url="https://github.com/aadil1/AI_Browser",
     packages=find_packages(exclude=["tests", "tests.*"]),
     python_requires=">=3.10",
     install_requires=[
@@ -40,8 +40,9 @@ setup(
     ],
     keywords="ai security prompt-injection llm browser agent rag sanitization",
     project_urls={
-        "Documentation": "https://github.com/safebrowse/safebrowse-python#readme",
-        "Source": "https://github.com/safebrowse/safebrowse-python",
-        "Issues": "https://github.com/safebrowse/safebrowse-python/issues",
+        "Documentation": "https://ai-browser-5d4p.onrender.com/docs",
+        "Source": "https://github.com/aadil1/AI_Browser",
+        "Tracker": "https://github.com/aadil1/AI_Browser/issues",
+        "Demo": "https://ai-browser-5d4p.onrender.com",
     },
 )
