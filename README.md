@@ -63,6 +63,24 @@ Run your own private instance on Render.
 ## 🧬 Architecture
 
 SafeBrowse uses a multi-layered defense strategy:
+
+```mermaid
+graph TD
+    User[User / AI Agent] -->|HTTPS Request| Ext[Chrome Extension / SDK]
+    Ext -->|1. Check Policy| Backend[SafeBrowse Backend]
+    
+    subgraph "SafeBrowse Cloud"
+        Backend -->|2. Heuristic Scan| Engine[Safety Engine]
+        Backend -->|3. LLM Audit| Model[LLM Guard]
+        Backend -->|4. Log| DB[(Audit Log)]
+    end
+    
+    Engine -- OK --> Model
+    Model -- OK --> Success[Allow Content]
+    Engine -- Fail --> Block[Block Request]
+    Model -- Fail --> Block
+```
+
 1.  **Policy Engine**: Blocks known malicious domains, login pages, and payment forms.
 2.  **Heuristic Scanner**: Detects hidden text, white-on-white text, and CSS obfuscation.
 3.  **LLM Pattern Matching**: Identifies instruction overrides ("Ignore previous instructions...").
