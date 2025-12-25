@@ -959,6 +959,36 @@ async def read_users_me(
     return current_user
 
 
+@app.get("/org/status", tags=["Auth"])
+async def get_org_status(
+    org: Organization = Depends(get_current_org_and_check_quota),
+    session: Session = Depends(get_session)
+):
+    """
+    Get organization status, tier, and quota usage.
+    """
+    from app.models import DailyUsage
+    from app.quota import TIER_LIMITS
+    
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+    
+    statement = select(DailyUsage).where(
+        DailyUsage.org_id == org.id,
+        DailyUsage.date == today
+    )
+    usage = session.exec(statement).first()
+    used = usage.request_count if usage else 0
+    limit = TIER_LIMITS.get(org.tier, 100)
+    
+    return {
+        "org_name": org.name,
+        "tier": org.tier,
+        "requests_today": used,
+        "daily_limit": limit,
+        "reset_time": "00:00 UTC"
+    }
+
+
 # ============== Agent Guard Endpoints ==============
 
 from app.agent_guard import AgentGuard, GuardSession, get_default_guard

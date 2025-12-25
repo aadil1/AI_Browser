@@ -145,6 +145,7 @@ function loadSectionData(section) {
             break;
         case 'api-keys':
             loadApiKeys();
+            loadOrgStatus();
             break;
         case 'settings':
             loadCapabilities();
@@ -233,6 +234,35 @@ async function loadApiKeys() {
         console.error('Failed to load keys:', error);
         const list = document.getElementById('api-keys-list');
         if (list) list.innerHTML = '<div class="error-state">Failed to load API keys</div>';
+    }
+}
+
+async function loadOrgStatus() {
+    try {
+        const status = await apiCall('/org/status');
+
+        // Update Tier
+        const tierEl = document.getElementById('plan-tier');
+        if (tierEl) tierEl.textContent = status.tier;
+
+        // Update Usage
+        const usageText = document.getElementById('usage-text');
+        if (usageText) usageText.textContent = `${status.requests_today} / ${status.daily_limit}`;
+
+        // Update Bar
+        const usageBar = document.getElementById('usage-bar');
+        if (usageBar) {
+            const pct = Math.min((status.requests_today / status.daily_limit) * 100, 100);
+            usageBar.style.width = `${pct}%`;
+
+            // Color coding
+            if (pct > 90) usageBar.style.backgroundColor = '#fa5252'; // Red
+            else if (pct > 75) usageBar.style.backgroundColor = '#fcc419'; // Yellow
+            else usageBar.style.backgroundColor = 'var(--primary)'; // Blue
+        }
+
+    } catch (error) {
+        console.error('Failed to load org status:', error);
     }
 }
 

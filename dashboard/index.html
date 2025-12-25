@@ -148,98 +148,130 @@
                         </ol>
                     </div>
 
-                    <div class="api-keys-list" id="api-keys-list">
-                        <!-- Key items injected here -->
-                    </div>
                 </div>
-
-                <div class="card">
-                    <h2>Provision New Access Key</h2>
-                    <div class="form-group">
-                        <label for="key-name">Key Name (e.g., Marketing Team, Finance)</label>
-                        <input type="text" id="key-name" placeholder="Team Name" aria-label="Key Name">
-                    </div>
-                    <div class="generated-key-container" id="generated-key-container" style="display: none;"
-                        role="alert" aria-live="assertive">
-                        <div class="alert alert-success">
-                            <strong>Provisioning Successful!</strong>
-                            <p>Copy this key now. It will not be shown again for security reasons.</p>
-                            <code id="generated-key" class="generated-key"></code>
-                            <button class="btn btn-copy" onclick="copyGeneratedKey()"
-                                aria-label="Copy new key to clipboard">Copy to Clipboard</button>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" id="generate-btn" onclick="generateApiKey()"
-                        aria-label="Confirm key generation">Provision Key</button>
+                <div class="api-keys-list" id="api-keys-list">
+                    <!-- Key items injected here -->
                 </div>
-            </section>
+    </div>
 
-            <!-- Audit Logs Section -->
-            <section id="section-audit" class="section" aria-label="Compliance Audit Logs">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Audit Logs</h2>
-                        <div class="filters">
-                            <select id="status-filter" aria-label="Filter by status">
-                                <option value="">All Statuses</option>
-                                <option value="ok">Allowed</option>
-                                <option value="blocked">Blocked</option>
-                            </select>
-                            <button class="btn btn-secondary" onclick="loadAuditLogs()"
-                                aria-label="Refresh logs">Refresh</button>
-                        </div>
-                    </div>
-
-                    <div class="table-container">
-                        <table class="table" id="audit-table" aria-label="System audit log table">
-                            <thead>
-                                <tr>
-                                    <th>Request ID</th>
-                                    <th>Timestamp</th>
-                                    <th>URL</th>
-                                    <th>Status</th>
-                                    <th>Risk Score</th>
-                                    <th>Details</th>
-                                </tr>
-                            </thead>
-                            <tbody id="audit-logs-body">
-                                <tr>
-                                    <td colspan="6" class="loading">Loading...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+    <!-- Plan & Usage Card -->
+    <div class="card" id="plan-usage-card">
+        <h2>Plan & Usage</h2>
+        <div class="plan-details">
+            <div class="plan-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div>
+                    <span style="font-size: 14px; color: var(--text-muted);">Current Plan</span>
+                    <div style="font-size: 18px; font-weight: 600; text-transform: uppercase; color: var(--primary);"
+                        id="plan-tier">--</div>
                 </div>
-            </section>
+                <a href="https://forms.gle/YOUR_FORM_ID" target="_blank" class="btn btn-secondary"
+                    style="text-decoration: none;">Upgrade to Pro ↗</a>
+            </div>
 
-            <!-- Settings Section -->
-            <section id="section-settings" class="section" aria-label="Backend Configuration">
-                <div class="card">
-                    <h2>Connectivity Settings</h2>
-                    <div class="form-group">
-                        <label for="backend-url">Backend Endpoint</label>
-                        <input type="text" id="backend-url" placeholder="http://localhost:8000 or empty for relative"
-                            aria-label="Backend URL">
-                    </div>
-                    <div class="form-group">
-                        <label for="dashboard-api-key">Administrative API Key</label>
-                        <input type="password" id="dashboard-api-key" placeholder="Enter master key"
-                            aria-label="Administrative API Key">
-                    </div>
-                    <button class="btn btn-primary" onclick="saveSettings()"
-                        aria-label="Save backend configuration">Save Configuration</button>
+            <div class="usage-stats">
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;">
+                    <span>Daily Requests</span>
+                    <span id="usage-text">-- / --</span>
                 </div>
+                <div class="progress-bar-container"
+                    style="background: #f1f3f4; border-radius: 4px; height: 8px; overflow: hidden;">
+                    <div id="usage-bar"
+                        style="background: var(--primary); width: 0%; height: 100%; transition: width 0.3s ease;"></div>
+                </div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px; text-align: right;">Resets at
+                    00:00 UTC</p>
+            </div>
+        </div>
+    </div>
 
-                <div class="card">
-                    <h2>Engine Status</h2>
-                    <div class="status-list" id="capabilities-list" aria-live="polite">
-                        <div class="status-item">
-                            <span class="status-name">Detecting safety features...</span>
-                        </div>
-                    </div>
+    <div class="card">
+        <h2>Provision New Access Key</h2>
+        <div class="form-group">
+            <label for="key-name">Key Name (e.g., Marketing Team, Finance)</label>
+            <input type="text" id="key-name" placeholder="Team Name" aria-label="Key Name">
+        </div>
+        <div class="generated-key-container" id="generated-key-container" style="display: none;" role="alert"
+            aria-live="assertive">
+            <div class="alert alert-success">
+                <strong>Provisioning Successful!</strong>
+                <p>Copy this key now. It will not be shown again for security reasons.</p>
+                <code id="generated-key" class="generated-key"></code>
+                <button class="btn btn-copy" onclick="copyGeneratedKey()" aria-label="Copy new key to clipboard">Copy to
+                    Clipboard</button>
+            </div>
+        </div>
+        <button class="btn btn-primary" id="generate-btn" onclick="generateApiKey()"
+            aria-label="Confirm key generation">Provision Key</button>
+    </div>
+    </section>
+
+    <!-- Audit Logs Section -->
+    <section id="section-audit" class="section" aria-label="Compliance Audit Logs">
+        <div class="card">
+            <div class="card-header">
+                <h2>Audit Logs</h2>
+                <div class="filters">
+                    <select id="status-filter" aria-label="Filter by status">
+                        <option value="">All Statuses</option>
+                        <option value="ok">Allowed</option>
+                        <option value="blocked">Blocked</option>
+                    </select>
+                    <button class="btn btn-secondary" onclick="loadAuditLogs()"
+                        aria-label="Refresh logs">Refresh</button>
                 </div>
-            </section>
-        </main>
+            </div>
+
+            <div class="table-container">
+                <table class="table" id="audit-table" aria-label="System audit log table">
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Timestamp</th>
+                            <th>URL</th>
+                            <th>Status</th>
+                            <th>Risk Score</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="audit-logs-body">
+                        <tr>
+                            <td colspan="6" class="loading">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Settings Section -->
+    <section id="section-settings" class="section" aria-label="Backend Configuration">
+        <div class="card">
+            <h2>Connectivity Settings</h2>
+            <div class="form-group">
+                <label for="backend-url">Backend Endpoint</label>
+                <input type="text" id="backend-url" placeholder="http://localhost:8000 or empty for relative"
+                    aria-label="Backend URL">
+            </div>
+            <div class="form-group">
+                <label for="dashboard-api-key">Administrative API Key</label>
+                <input type="password" id="dashboard-api-key" placeholder="Enter master key"
+                    aria-label="Administrative API Key">
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()" aria-label="Save backend configuration">Save
+                Configuration</button>
+        </div>
+
+        <div class="card">
+            <h2>Engine Status</h2>
+            <div class="status-list" id="capabilities-list" aria-live="polite">
+                <div class="status-item">
+                    <span class="status-name">Detecting safety features...</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    </main>
     </div>
 
     <script src="dashboard.js"></script>
