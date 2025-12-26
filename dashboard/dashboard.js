@@ -30,9 +30,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Setup Event Listeners
-    const filterSelect = document.getElementById('status-filter');
     if (filterSelect) {
         filterSelect.addEventListener('change', loadAuditLogs);
+    }
+
+    // Connect "Generate New Key" button to form
+    const jumpToKeyBtn = document.getElementById('generate-key-btn');
+    if (jumpToKeyBtn) {
+        jumpToKeyBtn.addEventListener('click', () => {
+            const input = document.getElementById('key-name');
+            if (input) {
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                input.focus();
+            }
+        });
     }
 });
 
