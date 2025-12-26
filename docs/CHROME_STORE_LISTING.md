@@ -105,7 +105,7 @@ English
 
 ## Privacy Policy URL
 ```
-https://safebrowse.io/privacy
+https://ai-browser-5d4p.onrender.com/dashboard/privacy.html
 ```
 
 ### Privacy Policy Content
