@@ -486,3 +486,20 @@ window.copyGeneratedKey = copyGeneratedKey;
 window.loadAuditLogs = loadAuditLogs;
 window.handleLogin = handleLogin;
 window.showLoginModal = showLoginModal;
+window.handleForgotPassword = handleForgotPassword;
+
+async function handleForgotPassword() {
+    const email = prompt("Enter your email address to receive a reset link:");
+    if (!email) return;
+
+    try {
+        await apiCall('/auth/password-reset/request', {
+            method: 'POST',
+            body: JSON.stringify({ email: email })
+        });
+        alert(`If an account exists for ${email}, a reset link has been logged to the server console (Simulation Mode).`);
+    } catch (error) {
+        console.error(error);
+        alert("Failed to request reset: " + error.message);
+    }
+}

@@ -1202,6 +1202,91 @@ async def list_api_keys(
     return results
 
 
+    return results
+
+
+# ============== Password Reset Endpoints ==============
+
+from app.schemas import PasswordResetRequest, PasswordResetConfirm
+
+@app.post("/auth/password-reset/request", tags=["Auth"])
+async def request_password_reset(
+    payload: PasswordResetRequest,
+    session: Session = Depends(get_session)
+):
+    """
+    Request a password reset link.
+    Since we don't have SMTP, we simulate sending email by logging the link.
+    """
+    statement = select(User).where(User.email == payload.email)
+    user = session.exec(statement).first()
+    
+    # Always return success to prevent email enumeration
+    if not user:
+        # Simulate delay
+        import time
+        time.sleep(0.5)
+        return {"message": "If an account exists, a reset link has been sent."}
+
+    # Generate reset token (short lived JWT)
+    reset_token_expires = timedelta(minutes=15)
+    reset_token = create_access_token(
+        data={"sub": user.email, "type": "reset"}, 
+        expires_delta=reset_token_expires
+    )
+    
+    # Build Link
+    # In prod, this would use the real frontend URL
+    reset_link = f"http://localhost:8000/dashboard/reset-password.html?token={reset_token}"
+    
+    # LOG IT (Simulation)
+    print("="*60)
+    print(f"📧 [SIMULATION] Password Reset Link for {user.email}:")
+    print(reset_link)
+    print("="*60)
+    
+    return {"message": "If an account exists, a reset link has been sent."}
+
+
+@app.post("/auth/password-reset/confirm", tags=["Auth"])
+async def confirm_password_reset(
+    payload: PasswordResetConfirm,
+    session: Session = Depends(get_session)
+):
+    """Confirm password reset using the token."""
+    settings = get_settings()
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid or expired reset token",
+    )
+    
+    try:
+        # Verify Token
+        token_data = jwt.decode(payload.token, settings.secret_key, algorithms=[settings.algorithm])
+        email: str = token_data.get("sub")
+        token_type: str = token_data.get("type")
+        
+        if email is None or token_type != "reset":
+            raise credentials_exception
+            
+    except PyJWTError:
+        raise credentials_exception
+        
+    # Get User
+    statement = select(User).where(User.email == email)
+    user = session.exec(statement).first()
+    if not user:
+        raise credentials_exception
+        
+    # Update Password
+    user.hashed_password = get_password_hash(payload.new_password)
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    
+    return {"message": "Password updated successfully. You can now login."}
+
+
 @app.get("/admin/fix-db", tags=["Admin"])
 def fix_database_schema(session: Session = Depends(get_session)):
     """
