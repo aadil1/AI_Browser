@@ -179,6 +179,18 @@ async function loadStats() {
         set('block-rate', `${stats.block_rate || 0}%`);
     } catch (error) {
         console.error('Failed to load stats:', error);
+        if (error.message.includes('403')) {
+            const grid = document.querySelector('.stats-grid');
+            if (grid) {
+                grid.innerHTML = `
+                  <div class="upgrade-banner" style="grid-column: 1 / -1; background: #f8f9fa; padding: 32px; text-align: center; border-radius: 8px; border: 1px dashed #ccc;">
+                      <h3 style="margin: 0 0 8px 0; font-size: 18px;">📊 Unlock Analytics</h3>
+                      <p style="margin: 0 0 16px 0; color: #666; font-size: 14px;">Detailed statistics are available on the Pro plan.</p>
+                      <a href="https://forms.gle/vGtps8qX4PeXJqn9A" target="_blank" class="btn btn-primary" style="display: inline-block;">Upgrade Now</a>
+                  </div>
+              `;
+            }
+        }
     }
 }
 
@@ -203,6 +215,10 @@ async function loadRecentActivity() {
         `).join('');
     } catch (error) {
         console.error('Failed to load activity:', error);
+        const tbody = document.querySelector('#recent-activity tbody');
+        if (tbody && error.message.includes('403')) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #666; font-size: 13px;">🔒 Upgrade to Pro to view activity</td></tr>';
+        }
     }
 }
 
@@ -294,7 +310,24 @@ async function loadAuditLogs() {
     } catch (error) {
         console.error('Failed to load audit logs:', error);
         const tbody = document.getElementById('audit-logs-body');
-        if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="loading">Failed to load logs</td></tr>';
+        if (tbody) {
+            if (error.message.includes('403')) {
+                tbody.innerHTML = `
+                 <tr>
+                     <td colspan="6" style="text-align:center; padding: 60px 20px;">
+                         <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                             <div style="font-size: 32px;">🔒</div>
+                             <h3 style="margin: 0; font-size: 18px;">Audit Logs Locked</h3>
+                             <p style="margin: 0; color: #666; max-width: 400px; line-height: 1.5;">Access to detailed request logs, compliance data, and advanced filtering is available on Pro and Enterprise tiers.</p>
+                             <a href="https://forms.gle/vGtps8qX4PeXJqn9A" target="_blank" class="btn btn-primary" style="margin-top: 12px;">Upgrade Plan</a>
+                         </div>
+                     </td>
+                 </tr>
+              `;
+            } else {
+                tbody.innerHTML = '<tr><td colspan="6" class="loading">Failed to load logs</td></tr>';
+            }
+        }
     }
 }
 
